@@ -1,4 +1,4 @@
-.userForm {
+.authForm {
   margin: 3rem auto;
   width: 95%;
   max-width: 25rem;
@@ -9,7 +9,7 @@
   text-align: center;
 }
 
-.userForm h1 {
+.authForm h1 {
   text-align: center;
   color: white;
 }

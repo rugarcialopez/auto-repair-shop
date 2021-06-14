@@ -3,7 +3,9 @@ import { Route, useHistory, useLocation } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
+import NewUserPage from './pages/NewUserPage';
 import RepairsPage from './pages/RepairsPage';
+import UsersPage from './pages/UsersPage';
 import AuthContext from './store/auth-context';
 
 function App() {
@@ -29,6 +31,12 @@ function App() {
       </Route>}
       { authContext.isLoggedIn && <Route path='/repairs'>
         <RepairsPage />
+      </Route>}
+      { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/users'>
+        <UsersPage />
+      </Route>}
+      { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/new-user'>
+        <NewUserPage />
       </Route>}
     </Layout>
   );

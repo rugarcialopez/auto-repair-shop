@@ -1,10 +1,12 @@
 class User {
-  email: string;
+  id?: string;
   password: string;
-  fullName?: string;
-  role?: string;
+  email: string;
+  fullName: string;
+  role: string;
 
-  constructor(fullName: string, email: string, password: string, role: string) {
+  constructor(id: string, fullName: string, email: string, role: string, password: string) {
+    this.id = id;
     this.fullName = fullName;
     this.email = email;
     this.password = password;

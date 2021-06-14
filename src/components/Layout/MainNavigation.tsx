@@ -17,6 +17,9 @@ const MainNavigation = () => {
           {authContext.isLoggedIn && <li>
             <NavLink to='/repairs' activeClassName={classes.active}>Repairs</NavLink>
           </li>}
+          {authContext.isLoggedIn && authContext.role === 'manager' && <li>
+            <NavLink to='/users' activeClassName={classes.active}>Users</NavLink>
+          </li>}
           {authContext.isLoggedIn && <li>
             <NavLink to='/' activeClassName={classes.active} onClick={authContext.logout} exact>Logout</NavLink>
           </li>}

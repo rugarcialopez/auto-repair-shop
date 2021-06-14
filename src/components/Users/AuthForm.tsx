@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useInput from '../../hooks/use-input';
-import User from '../../models/User';
-import classes from './UserForm.module.css';
+import AuthUser from '../../models/AuthUser';
+import classes from './AuthForm.module.css';
 
 const isNotEmpty = (value: string) => value.trim() !== '';
 const isEmail = (value: string) => {
@@ -11,8 +11,9 @@ const isEmail = (value: string) => {
 
 const isCorrectPassword = (value: string) => isNotEmpty(value) && value.length >= 5;
 
-const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
+const AuthForm: React.FC<{ onLogin: (user: AuthUser) => void}> = (props) => {
   const [roleSelected, setRoleSelected] = useState('manager');
+  const [isLogin, setIsLogin] = useState(true);
 
   const {
     value: enteredFullName,
@@ -38,7 +39,13 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
     inputBlurHandler: passwordBlurHanlder,
   } = useInput(isCorrectPassword);
 
-  let formIsValid = enteredFullNameIsValid && enteredEmailIsValid && enteredPasswordIsValid;
+  let formIsValid = false;
+
+  if (isLogin) {
+    formIsValid = enteredEmailIsValid && enteredPasswordIsValid;
+  } else {
+    formIsValid = enteredFullNameIsValid && enteredEmailIsValid && enteredPasswordIsValid;
+  }
 
   const roleChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setRoleSelected(event.target.value);
@@ -46,12 +53,23 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddUser({
-      fullName: enteredFullName,
-      email: enteredEmail,
-      password: enteredPassword,
-      role: roleSelected
-    });
+    if (isLogin) {
+      props.onLogin({
+        email: enteredEmail,
+        password: enteredPassword,
+      });
+    } else {
+      props.onLogin({
+        fullName: enteredFullName,
+        email: enteredEmail,
+        password: enteredPassword,
+        role: roleSelected
+      });
+    }
+  }
+
+  const switchAuthModeHandler = () => {
+    setIsLogin((prevState) => !prevState);
   }
 
   const fullNameClasses = !fullNameInputHasError ? classes.control : classes.control + ' ' + classes.invalid;
@@ -59,13 +77,14 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
   const passwordClasses = !passwordInputHasError ? classes.control : classes.control + ' ' + classes.invalid;
 
   return (
-    <section className={classes.userForm}>
+    <section className={classes.authForm}>
+      <h1>{isLogin ? 'Sign In' : 'Sign Up'}</h1>
       <form onSubmit={submitHandler}>
-        <div className={fullNameClasses}>
+        { !isLogin && <div className={fullNameClasses}>
           <label htmlFor='fullName'>Your full name</label>
           <input type='text' id='fullName' onChange={fullNameChangeHandler} value={enteredFullName} onBlur={fullNameBlurHanlder} aria-label='fullName-input'/>
           {fullNameInputHasError && <p className={classes['error-text']}>Please enter a full name.</p>}
-        </div>
+        </div>}
         <div className={emailClasses}>
           <label htmlFor='email'>Your Email</label>
           <input type='email' id='email' onChange={emailChangeHandler} value={enteredEmail} onBlur={emailBlurHanlder} aria-label='email-input'/>
@@ -76,19 +95,26 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
           <input type='password' id='password' onChange={passwordChangeHandler} value={enteredPassword} onBlur={passwordBlurHanlder} aria-label='password-input'/>
           {passwordInputHasError && <p className={classes['error-text']}>Please enter a valid password (min length 5 characters)</p>}
         </div>
-        <div className={classes.control}>
+        { !isLogin && <div className={classes.control}>
           <label htmlFor='role'>Your role</label>
           <select name='role' id='role' value={roleSelected} onChange={roleChangeHandler}>
             <option value='manager'>Manager</option>
             <option value='user'>User</option>
           </select>
-        </div>
+        </div>}
         <div className={classes.actions}>
-          <button type='submit' disabled={!formIsValid}>Add user</button>
+          <button type='submit' disabled={!formIsValid}>{isLogin ? 'Login' : 'Create Account'}</button>
+          <button
+            type='button'
+            className={classes.toggle}
+            onClick={switchAuthModeHandler}
+          >
+            {isLogin ? 'Create new account' : 'Login with existing account'}
+          </button>
         </div>
       </form>
     </section>
   );
 };
 
-export default UserForm;
+export default AuthForm;

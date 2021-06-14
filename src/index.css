@@ -16,7 +16,7 @@ body {
   align-items: center;
 }
 
-/* .focused {
+.focused {
   font-size: 3rem;
   font-weight: bold;
   color: white;
@@ -53,4 +53,4 @@ body {
 .btn--flat:active {
   background-color: teal;
   color: white;
-} */
+}

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useHistory } from "react-router";
-import UserForm from "../components/Users/UserForm";
-import User from "../models/User";
+import AuthForm from "../components/Users/AuthForm";
+import AuthUser from "../models/AuthUser";
 import AuthContext from "../store/auth-context";
 
 
@@ -10,11 +10,11 @@ const AuthPage = () => {
   const history = useHistory();
 
 
-  const loginHandler = async (user: User) => {
+  const loginHandler = async (user: AuthUser) => {
     console.log('[AuthPage] loginHandler');
     const isLogin = !(user.fullName && user.role);
     let url = 'http://localhost:4000/api/signIn';
-    let body: User = {
+    let body: AuthUser = {
       email: user.email,
       password: user.password
     }
@@ -46,7 +46,7 @@ const AuthPage = () => {
       alert(error);
     }
   }
-  return <UserForm onLogin={loginHandler}/>
+  return <AuthForm onLogin={loginHandler}/>
 }
 
 export default AuthPage;
