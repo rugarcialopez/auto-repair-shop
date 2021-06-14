@@ -3,14 +3,14 @@ import classes from './UserList.module.css';
 import NoUsersFound from './NoUsersFound';
 import UserItem from "./UserItem";
 
-type UserDetail = {
+type UserItemObj = {
   id: string,
   role: string,
   fullName: string,
   email: string;
 };
 
-const UserList: React.FC<{ usersList: UserDetail[]}> = (props) => {
+const UserList: React.FC<{ usersList: UserItemObj[]}> = (props) => {
   if (props.usersList.length === 0) {
     return <NoUsersFound />
   }
