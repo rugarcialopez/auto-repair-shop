@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import classes from './UserList.module.css';
-import NoUsersFound from './NoUsersFound';
 import UserItem from "./UserItem";
 
 type UserItemObj = {
@@ -11,9 +10,6 @@ type UserItemObj = {
 };
 
 const UserList: React.FC<{ usersList: UserItemObj[]}> = (props) => {
-  if (props.usersList.length === 0) {
-    return <NoUsersFound />
-  }
   return (
     <Fragment>
       <ul className={classes.list}>
