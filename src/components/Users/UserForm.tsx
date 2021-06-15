@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useInput from '../../hooks/use-input';
 import User from '../../models/User';
 import classes from './UserForm.module.css';
@@ -11,15 +11,19 @@ const isEmail = (value: string) => {
 
 const isCorrectPassword = (value: string) => isNotEmpty(value) && value.length >= 5;
 
-const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
+const UserForm: React.FC<{ onSubmit: (newUser: User) => void, user?: User}> = (props) => {
+  const fullName = props.user ? props.user.fullName : null;
+  const email = props.user ? props.user.email : null;
+  const role = props.user ? props.user.role : null;
   const [roleSelected, setRoleSelected] = useState('manager');
 
-  const {
+  let {
     value: enteredFullName,
     isValid: enteredFullNameIsValid,
     hasError: fullNameInputHasError,
     valueChangeHandler: fullNameChangeHandler,
     inputBlurHandler: fullNameBlurHanlder,
+    set: setFullName,
   } = useInput(isNotEmpty);
 
   const {
@@ -28,6 +32,7 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
     hasError: emailInputHasError,
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHanlder,
+    set: setEmail,
   } = useInput(isEmail);
 
   const {
@@ -38,7 +43,16 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
     inputBlurHandler: passwordBlurHanlder,
   } = useInput(isCorrectPassword);
 
-  let formIsValid = enteredFullNameIsValid && enteredEmailIsValid && enteredPasswordIsValid;
+  useEffect(() => {
+    if (fullName && email && role) {
+      setFullName(fullName);
+      setEmail(email);
+      setRoleSelected(role);
+    }
+  }, [fullName, email, role, setFullName, setEmail, setRoleSelected]);
+
+  let formIsValid = !props.user ? enteredFullNameIsValid && enteredEmailIsValid && enteredPasswordIsValid : enteredFullNameIsValid && enteredEmailIsValid;
+
 
   const roleChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setRoleSelected(event.target.value);
@@ -46,12 +60,20 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    props.onAddUser({
-      fullName: enteredFullName,
-      email: enteredEmail,
-      password: enteredPassword,
-      role: roleSelected
-    });
+    if (props.user) {
+      props.onSubmit({
+        fullName: enteredFullName,
+        email: enteredEmail,
+        role: roleSelected
+      });
+    } else {
+      props.onSubmit({
+        fullName: enteredFullName,
+        email: enteredEmail,
+        password: enteredPassword,
+        role: roleSelected
+      });
+    }
   }
 
   const fullNameClasses = !fullNameInputHasError ? classes.control : classes.control + ' ' + classes.invalid;
@@ -71,11 +93,11 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
           <input type='email' id='email' onChange={emailChangeHandler} value={enteredEmail} onBlur={emailBlurHanlder} aria-label='email-input'/>
           {emailInputHasError && <p className={classes['error-text']}>Please enter a valid email address.</p>}
         </div>
-        <div className={passwordClasses}>
+        { !props.user && <div className={passwordClasses}>
           <label htmlFor='password'>Your Password</label>
           <input type='password' id='password' onChange={passwordChangeHandler} value={enteredPassword} onBlur={passwordBlurHanlder} aria-label='password-input'/>
           {passwordInputHasError && <p className={classes['error-text']}>Please enter a valid password (min length 5 characters)</p>}
-        </div>
+        </div> }
         <div className={classes.control}>
           <label htmlFor='role'>Your role</label>
           <select name='role' id='role' value={roleSelected} onChange={roleChangeHandler}>
@@ -84,7 +106,7 @@ const UserForm: React.FC<{ onAddUser: (newUser: User) => void}> = (props) => {
           </select>
         </div>
         <div className={classes.actions}>
-          <button type='submit' disabled={!formIsValid}>Add user</button>
+          <button type='submit' disabled={!formIsValid}>{ props.user ? 'Update user' : 'Add user' }</button>
         </div>
       </form>
     </section>

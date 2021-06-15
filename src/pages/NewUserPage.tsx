@@ -30,7 +30,7 @@ const NewUserPage = () => {
     }
   }
 
-  return <UserForm onAddUser={addUserHandler}/>
+  return <UserForm onSubmit={addUserHandler} />
 }
 
 export default NewUserPage;

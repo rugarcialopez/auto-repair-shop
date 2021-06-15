@@ -1,5 +1,5 @@
 
-import React, { useReducer } from 'react';
+import React, { useCallback, useReducer } from 'react';
 
 type InputState = {
   value: string,
@@ -53,9 +53,9 @@ const useInput = (validateValue: (value: string) => boolean) => {
     dispatch({ type: 'RESET', value: '' });
   };
 
-  const set = (value: string) => {
+  const set = useCallback((value: string) => {
     dispatch({ type: 'SET', value: value });
-  };
+  }, []);
 
   const response: {
     value: string,

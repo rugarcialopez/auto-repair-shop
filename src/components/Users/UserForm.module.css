@@ -63,8 +63,8 @@
   cursor: pointer;
   font: inherit;
   color: white;
-  background-color: teal;
-  border: 1px solid teal;
+  background-color: #11acac;;
+  border: 1px solid #11acac;;
   border-radius: 4px;
   padding: 0.5rem 2.5rem;
 }

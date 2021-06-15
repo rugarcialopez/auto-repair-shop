@@ -1,6 +1,6 @@
 class User {
   id?: string;
-  password: string;
+  password?: string;
   email: string;
   fullName: string;
   role: string;
