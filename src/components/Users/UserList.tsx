@@ -9,11 +9,13 @@ type UserItemObj = {
   email: string;
 };
 
-const UserList: React.FC<{ usersList: UserItemObj[]}> = (props) => {
+const UserList: React.FC<{ usersList: UserItemObj[], onRemove: (id: string) => void}> = (props) => {
+
+
   return (
     <Fragment>
       <ul className={classes.list}>
-        {props.usersList.map(user => <UserItem fullName={user.fullName} id={user.id} key={user.id} role={user.role}/>)}
+        {props.usersList.map(user => <UserItem fullName={user.fullName} id={user.id} key={user.id} role={user.role} onRemove={props.onRemove}/>)}
       </ul>
     </Fragment>
   )

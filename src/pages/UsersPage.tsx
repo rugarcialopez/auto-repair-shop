@@ -41,9 +41,35 @@ const UsersPage = () => {
     getUsers()
   }, [getUsers]);
 
+  const removeHandler = useCallback(async(id: string) => {
+    try {
+      setStatus('pending');
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:4000/api/delete-user/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-type': 'application/json',
+          'token': token
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setUsersList(data.users);
+      } else {
+        throw Error(data.message || response.statusText)
+      }
+      setIsLoading(false);
+      setStatus('completed');
+    } catch (error) {
+      setIsLoading(false);
+      setStatus('completed');
+      alert(error);
+    }
+  }, [token]);
+
   return (
     <Fragment>
-      { !isLoading && usersList.length !== 0 && <UserList usersList={usersList}/> }
+      { status === 'completed' && usersList.length !== 0 && <UserList usersList={usersList} onRemove={removeHandler}/> }
       { status === 'completed' && usersList.length === 0 && <NoUsersFound/> }
       { isLoading && <LoadingSpinner/> }
     </Fragment>
