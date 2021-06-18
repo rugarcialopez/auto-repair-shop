@@ -1,51 +1,68 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useHistory } from "react-router";
 import AuthForm from "../components/Users/AuthForm";
+import useHttp from "../hooks/use-http";
+import { signIn, signUp } from "../lib/api";
 import AuthUser from "../models/AuthUser";
 import AuthContext from "../store/auth-context";
+
+type Login = {
+  token: string,
+  role: string,
+  expirationTime: number
+}
 
 
 const AuthPage = () => {
   const authContext = useContext(AuthContext);
   const history = useHistory();
+  const { sendRequest: signInRequest, data: signInData, status: signInStatus, error: signInError } = useHttp<Login, { password: string, email: string }>(signIn);
+  const { sendRequest: signUpRequest, data: signUpData, status: signUpStatus, error: signUpError } = useHttp<Login, { fullName: string, password: string, role: string, email: string }>(signUp);
 
+  useEffect(() => {
+    if (signInError || signUpError) {
+      alert(signInError || signUpError);
+    }
+  }, [signInError, signUpError])
 
   const loginHandler = async (user: AuthUser) => {
-    console.log('[AuthPage] loginHandler');
     const isLogin = !(user.fullName && user.role);
-    let url = 'http://localhost:4000/api/signIn';
-    let body: AuthUser = {
-      email: user.email,
-      password: user.password
-    }
+    
     if (!isLogin) {
-      url = 'http://localhost:4000/api/signUp';
-      body = {...body, fullName: user.fullName, role: user.role };
-    }
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers:{
-          'Content-Type': 'application/json'
+      signUpRequest({
+        body: {
+          email: user.email,
+          password: user.password,
+          role: user.role || '',
+          fullName: user.fullName || ''
         }
       });
-      const data = await response.json();
-      if (response.ok) {
-        console.log(data);
-        const expirationTime = new Date(
-          new Date().getTime() + (data.expirationTime * 1000)
-        );
-        console.log(expirationTime);
-        authContext.login(data.token, data.role, expirationTime.toISOString());
-        history.push('/repairs');
-      } else {
-        throw Error(data?.message || response.statusText);
-      } 
-    } catch (error) {
-      alert(error);
+    } else {
+      signInRequest({
+        body: {
+          email: user.email,
+          password: user.password,
+        }
+      });
     }
   }
+
+  if (signInStatus === 'completed' && signInData) {
+    const expirationTime = new Date(
+      new Date().getTime() + (signInData.expirationTime * 1000)
+    );
+    authContext.login(signInData.token, signInData.role, expirationTime.toISOString());
+    history.push('/repairs');
+  }
+
+  if (signUpStatus === 'completed' && signUpData) {
+    const expirationTime = new Date(
+      new Date().getTime() + (signUpData.expirationTime * 1000)
+    );
+    authContext.login(signUpData.token, signUpData.role, expirationTime.toISOString());
+    history.push('/repairs');
+  }
+
   return <AuthForm onLogin={loginHandler}/>
 }
 

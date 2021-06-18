@@ -16,8 +16,8 @@ type UserItemObj = {
 const UsersPage = () => {
   const authContext = useContext(AuthContext);
   const token = authContext.token;
-  const { sendRequest: getAllUsersRequest, data: allUsers, status: statusAllUsers, error: errorAllUsers } = useHttp<UserItemObj[]>(getAllUsers);
-  let { sendRequest: removeUserRequest, data: newAllUsers, status: statusRemoveUser, error: errorRemoveUser } = useHttp<UserItemObj[]>(removeUser);
+  const { sendRequest: getAllUsersRequest, data: allUsers, status: statusAllUsers, error: errorAllUsers } = useHttp<UserItemObj[], {}>(getAllUsers);
+  let { sendRequest: removeUserRequest, data: newAllUsers, status: statusRemoveUser, error: errorRemoveUser } = useHttp<UserItemObj[], {}>(removeUser);
 
   useEffect(() => {
     getAllUsersRequest({token})

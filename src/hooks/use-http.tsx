@@ -48,11 +48,11 @@ const createHttpReducer = <T,>() => (state: HttpState<T>, action: HttpAction<T>)
 }
 
 
-const useHttp = <T,> (requestFunction: (requestData: RequestData) => Promise<T>) => {
+const useHttp = <T,Y> (requestFunction: (requestData: RequestData<Y>) => Promise<T>) => {
   const httpReducer = createHttpReducer<T>();
   const [httpState, dispatch] = useReducer(httpReducer, initialState);
   
-  const sendRequest = useCallback(async(requestData: RequestData) => {
+  const sendRequest = useCallback(async(requestData: RequestData<Y>) => {
     try {
       dispatch({ type: 'pending'});
       const data = await requestFunction(requestData);
