@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useHistory } from "react-router";
-import AuthForm from "../components/Users/AuthForm";
+import AuthForm from "../components/Auth/AuthForm";
 import useHttp from "../hooks/use-http";
 import { signIn, signUp } from "../lib/api";
 import AuthUser from "../models/AuthUser";
