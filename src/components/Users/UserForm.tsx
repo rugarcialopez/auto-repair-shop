@@ -82,6 +82,7 @@ const UserForm: React.FC<{ onSubmit: (newUser: User) => void, user?: User}> = (p
 
   return (
     <section className={classes.userForm}>
+      <h1>User form</h1>
       <form onSubmit={submitHandler}>
         <div className={fullNameClasses}>
           <label htmlFor='fullName'>Your full name</label>
