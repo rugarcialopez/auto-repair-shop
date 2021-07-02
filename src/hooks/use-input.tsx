@@ -41,7 +41,7 @@ const useInput = (validateValue: (value: string) => boolean) => {
   const valueIsValid = validateValue(inputState.value);
   const hasError = !valueIsValid && inputState.isTouched;
 
-  const valueChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const valueChangeHandler = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLSelectElement>) => {
     dispatch({ type: 'INPUT', value: event.target.value });
   };
 
@@ -61,7 +61,7 @@ const useInput = (validateValue: (value: string) => boolean) => {
     value: string,
     isValid: boolean,
     hasError: boolean,
-    valueChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void,
+    valueChangeHandler: (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLSelectElement>) => void,
     inputBlurHandler: () => void,
     reset: () => void,
     set: (value: string) => void

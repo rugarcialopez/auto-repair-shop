@@ -2,8 +2,10 @@ import { useContext } from 'react';
 import { Route, Switch, useHistory, useLocation } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import AuthPage from './pages/AuthPage';
+import EditRepairPage from './pages/EditRepairPage';
 import EditUserPage from './pages/EditUserPage';
 import HomePage from './pages/HomePage';
+import NewRepairPage from './pages/NewRepairPage';
 import NewUserPage from './pages/NewUserPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RepairsPage from './pages/RepairsPage';
@@ -32,6 +34,9 @@ function App() {
         { !authContext.isLoggedIn && <Route path='/login'>
           <AuthPage />
         </Route>}
+        { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/repairs/:id'>
+          <EditRepairPage />
+        </Route>}
         { authContext.isLoggedIn && <Route path='/repairs'>
           <RepairsPage />
         </Route>}
@@ -43,6 +48,9 @@ function App() {
         </Route>}
         { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/new-user'>
           <NewUserPage />
+        </Route>}
+        { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/new-repair'>
+          <NewRepairPage />
         </Route>}
         <Route path='*'>
           <NotFoundPage />

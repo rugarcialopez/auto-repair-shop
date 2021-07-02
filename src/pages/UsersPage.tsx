@@ -1,23 +1,17 @@
 import { useCallback, useContext, useEffect } from "react";
+import DataList from "../components/UI/DataList";
+import Data from '../models/Data';
 import LoadingSpinner from "../components/UI/LoadingSpinner";
-import NoUsersFound from "../components/Users/NoUsersFound";
-import UserList from "../components/Users/UserList";
+import NoDataFound from "../components/UI/NoDataFound";
 import useHttp from "../hooks/use-http";
 import { getAllUsers, removeUser } from "../lib/api";
-import AuthContext from "../store/auth-context";
-
-type UserItemObj = {
-  id: string,
-  role: string,
-  fullName: string,
-  email: string;
-};
+import AuthContext from "../store/auth-context"
 
 const UsersPage = () => {
   const authContext = useContext(AuthContext);
   const token = authContext.token;
-  const { sendRequest: getAllUsersRequest, data: allUsers, status: statusAllUsers, error: errorAllUsers } = useHttp<UserItemObj[], {}>(getAllUsers);
-  let { sendRequest: removeUserRequest, data: newAllUsers, status: statusRemoveUser, error: errorRemoveUser } = useHttp<UserItemObj[], {}>(removeUser);
+  const { sendRequest: getAllUsersRequest, data: allUsers, status: statusAllUsers, error: errorAllUsers } = useHttp<Data[], {}>(getAllUsers);
+  let { sendRequest: removeUserRequest, data: newAllUsers, status: statusRemoveUser, error: errorRemoveUser } = useHttp<Data[], {}>(removeUser);
 
   useEffect(() => {
     getAllUsersRequest({token})
@@ -36,18 +30,18 @@ const UsersPage = () => {
   }
 
   if (statusAllUsers === 'completed' && (!allUsers || allUsers.length === 0)) {
-    return <NoUsersFound/>
+    return <NoDataFound message='No users found!' to='/new-user' btnText='Add a User'/>
   }
 
   if (statusRemoveUser === 'completed' && (!newAllUsers || newAllUsers.length === 0)) {
-    return <NoUsersFound/>
+    return <NoDataFound message='No users found!' to='/new-user' btnText='Add a User'/>
   }
 
   if(statusRemoveUser === 'completed' && newAllUsers && newAllUsers.length > 0) {
-    return <UserList usersList={newAllUsers} onRemove={removeHandler}/>
+    return <DataList data={newAllUsers} to='/new-user' btnText='Add a user' onRemove={removeHandler}/>
   }
 
-  return <UserList usersList={allUsers || []} onRemove={removeHandler}/>
+  return <DataList data={allUsers || []} to='/new-user' btnText='Add a user' onRemove={removeHandler}/>
 }
 
 export default UsersPage;

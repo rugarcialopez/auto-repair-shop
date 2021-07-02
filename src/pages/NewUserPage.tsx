@@ -18,7 +18,7 @@ const NewUserPage = () => {
         fullName: newUser.fullName,
         password: newUser.password || '',
         role: newUser.role,
-        email: newUser.role
+        email: newUser.email
       }
     });
   }

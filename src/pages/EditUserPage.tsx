@@ -10,7 +10,7 @@ import AuthContext from "../store/auth-context";
 const EditUserPage = () => {
   const history = useHistory();
   const { sendRequest: getUserRequest, data: getUserData, status: getUserStatus } = useHttp<User, {}>(getUser);
-  const { sendRequest: updateUserRequest, status: updateUserStatus, error: updateUserError } = useHttp<User, {fullName: string, email: string, role: string}>(updateUser);
+  const { sendRequest: updateUserRequest, status: updateUserStatus, error: updateUserError } = useHttp<{message: string}, {fullName: string, email: string, role: string}>(updateUser);
 
   const authContext = useContext(AuthContext);
   const params: { id: string} = useParams();
