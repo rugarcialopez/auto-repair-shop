@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import useInput from '../../hooks/use-input';
+import { checkAvailability } from '../../lib/api';
 import Repair from '../../models/Repair';
+import AuthContext from '../../store/auth-context';
 import classes from './RepairForm.module.css';
 
 const isNotEmpty = (value: string) => value.trim() !== '';
@@ -11,11 +13,16 @@ const RepairForm: React.FC<{
   repair?: { id: string, description: string, date: string, time: number, userId: string }
   }> = (props) => {
 
+  const authContext = useContext(AuthContext);
+  const token = authContext.token;
+
   const id = props.repair ? props.repair.id : null;
   const description = props.repair ? props.repair.description : null;
   const date = props.repair ? props.repair.date : null;
   const time = props.repair ? props.repair.time : null;
   const userId = props.repair ? props.repair.userId : null;
+  const [isTimeAvailable, setIsTimeAvailable] = useState(false);
+  const [timeError, setTimeError] = useState('');
   
   const {
     value: enteredDescription,
@@ -62,7 +69,16 @@ const RepairForm: React.FC<{
     }
   }, [description, time, date, userId, setDescription, setDate, setTime, setUser])
 
-  let formIsValid = enteredDescriptionIsValid && enteredTimeIsValid && enteredDateIsValid && enteredUserIsValid;
+  useEffect(() => {
+    if (id && parseInt(enteredTime.split(':')[0]) === time) {
+      setIsTimeAvailable(true);
+    } else {
+      setIsTimeAvailable(false);
+    }
+    setTimeError('');
+  }, [id, time, enteredTime]);
+
+  let formIsValid = enteredDescriptionIsValid && enteredTimeIsValid && enteredDateIsValid && enteredUserIsValid && isTimeAvailable;
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
@@ -78,10 +94,32 @@ const RepairForm: React.FC<{
     props.onSubmit(repair);
   }
 
+  const checkAvailabilityHandler = async () => {
+    if (enteredTime === '' || !enteredDate) {
+      setIsTimeAvailable(false);
+      setTimeError('Date and time are required');
+      return;
+    }
+    try {
+      const response = await checkAvailability({token, date: enteredDate, time: enteredTime});
+      if(response) {
+        setIsTimeAvailable(true);
+        alert('Time is available');
+      } else {
+        setIsTimeAvailable(false);
+        setTimeError('Time is not available');
+      }
+    } catch (error) {
+      setIsTimeAvailable(false);
+      setTimeError(error.message);
+    }
+
+  }
+
 
   const descriptionClasses = !descriptionHasError ? classes.control : classes.control + ' ' + classes.invalid;
   const dateClasses = !dateHasError ? classes.control : classes.control + ' ' + classes.invalid;
-  const timeClasses = !timeHasError ? classes.control : classes.control + ' ' + classes.invalid;
+  const timeClasses = !timeHasError ? classes.control + ' ' + classes.time  : classes.control + ' ' + classes.invalid;
   const userClasses = !userHasError ? classes.control : classes.control + ' ' + classes.invalid;
 
   return (
@@ -102,6 +140,8 @@ const RepairForm: React.FC<{
           <label htmlFor='time'>Choose a repair time (opening hours 09:00 to 18:00)</label>
           <input type='time' id='time' value={enteredTime} onChange={timeChangeHandler} onBlur={timeBlurHanlder} min='09:00' max='18:00' step='3600' aria-label='time-input'/>
           {dateHasError && <p className={classes['error-text']}>Please enter a time.</p>}
+          <button className='btn' type='button' onClick={checkAvailabilityHandler} disabled={isTimeAvailable}>Check availability</button>
+          {!isTimeAvailable && <p className={classes['error-text']}>{timeError}</p> }
         </div>
         <div className={userClasses}>
           <label htmlFor='user'>Choose a user for this repair</label>

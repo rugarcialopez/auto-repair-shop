@@ -211,6 +211,23 @@ const updateRepair =  async (requestData: RequestData<{description: string, date
   }
 }
 
+const checkAvailability = async ( requestData: RequestData<{}>) => {
+  const url = `${API_URL}/availability?time=${requestData.time}&date=${requestData.date}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+      'token': requestData.token || ''
+    }
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data.available;
+  } else {
+    throw Error(data.message || response.statusText);
+  }
+}
+
 export { 
   getAllUsers,
   removeUser,
@@ -223,5 +240,6 @@ export {
   getRepairs,
   removeRepair,
   getRepair,
-  updateRepair
+  updateRepair,
+  checkAvailability
 };

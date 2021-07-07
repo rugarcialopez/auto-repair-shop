@@ -38,6 +38,24 @@
   padding: 0.25rem;
 }
 
+.time input {
+  width: 65%;
+}
+
+.time button {
+  width: 32%;
+  margin-left:15px;
+}
+
+.time button:disabled,
+.time button:disabled:hover,
+.time button:disabled:active {
+  background-color: #ccc;
+  color: #292929;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
 .invalid input {
   border-color: red;
 }
