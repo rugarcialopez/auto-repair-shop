@@ -2,15 +2,10 @@ import { useContext, useEffect } from "react";
 import { useHistory, useParams } from "react-router";
 import RepairForm from "../components/Repairs/RepairForm";
 import useHttp from "../hooks/use-http";
-import Repair from "../models/Repair";
+import Repair, { RepairObj } from "../models/Repair";
 import AuthContext from "../store/auth-context";
 import { getRepair, updateRepair } from  "../lib/api";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
-
-type RepairObj = {
-  repair: { id: string, description: string, date: string, time: number, userId: string },
-  users: {id: string, fullName: string, role: string}[],
-}
 
 const EditRepairPage = () => {
   const authContext = useContext(AuthContext);

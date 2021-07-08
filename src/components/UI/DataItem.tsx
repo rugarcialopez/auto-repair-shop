@@ -28,7 +28,7 @@ const DataItem: React.FC<{data: Data, onRemove: (id: string) => void }> = (props
       { authContext.role === 'manager' && <Link className='btn' to={props.data.date ? `/repairs/${props.data.id}` : `/users/${props.data.id}`}>
         View Fullscreen
       </Link> }
-      { props.data.repairState && !(props.data.repairState !== 'uncompleted' && authContext.role === 'user') && <Link className='btn' to={`/repairs/mark/${props.data.id}?repairState=${props.data.repairState}` }>
+      { props.data.repairState && !(props.data.repairState !== 'uncompleted' && authContext.role === 'user') && <Link className='btn' to={`/repairs/mark/${props.data.id}` }>
         Mark
       </Link> }
     </li>

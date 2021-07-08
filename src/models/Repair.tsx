@@ -1,3 +1,8 @@
+export type RepairObj = {
+  repair: { id: string, description: string, date: string, time: number, userId: string, repairState: string },
+  users: {id: string, fullName: string, role: string}[],
+}
+
 class Repair {
   id?: string;
   description: string;
