@@ -245,6 +245,54 @@ const markRepair =  async (requestData: RequestData<{repairState: string, userId
   }
 }
 
+const getAllComments = async ( requestData: RequestData<{}>) => {
+  const response = await fetch(`${API_URL}/repairs/${requestData.id}/comments`, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+      'token': requestData.token || ''
+    }
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data.comments;
+  } else {
+    throw Error(data.message || response.statusText);
+  }
+}
+
+const addComment =  async (requestData: RequestData<{comment: string}>) => {
+  const response = await fetch(`${API_URL}/repairs/${requestData.id}/comments`, {
+    method: 'POST',
+    body: JSON.stringify(requestData.body),
+    headers: {
+      'Content-type': 'application/json',
+      'token': requestData.token || ''
+    }
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throw Error(data.message || response.statusText)
+  }
+}
+const getMark = async ( requestData: RequestData<{}>) => {
+  const response = await fetch(`${API_URL}/repairs/${requestData.id}/mark`, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+      'token': requestData.token || ''
+    }
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data.repair;
+  } else {
+    throw Error(data.message || response.statusText);
+  }
+}
+
 export { 
   getAllUsers,
   removeUser,
@@ -259,5 +307,8 @@ export {
   getRepair,
   updateRepair,
   checkAvailability,
-  markRepair
+  markRepair,
+  getAllComments,
+  addComment,
+  getMark
 };
