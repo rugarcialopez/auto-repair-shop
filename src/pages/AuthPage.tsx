@@ -10,6 +10,7 @@ type Login = {
   token: string,
   role: string,
   expirationTime: number
+  userId: string;
 }
 
 
@@ -51,7 +52,7 @@ const AuthPage = () => {
     const expirationTime = new Date(
       new Date().getTime() + (signInData.expirationTime * 1000)
     );
-    authContext.login(signInData.token, signInData.role, expirationTime.toISOString());
+    authContext.login(signInData.token, signInData.role, expirationTime.toISOString(), signInData.userId);
     history.push('/repairs');
   }
 
@@ -59,7 +60,7 @@ const AuthPage = () => {
     const expirationTime = new Date(
       new Date().getTime() + (signUpData.expirationTime * 1000)
     );
-    authContext.login(signUpData.token, signUpData.role, expirationTime.toISOString());
+    authContext.login(signUpData.token, signUpData.role, expirationTime.toISOString(), signUpData.userId);
     history.push('/repairs');
   }
 

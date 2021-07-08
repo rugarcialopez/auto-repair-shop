@@ -228,6 +228,23 @@ const checkAvailability = async ( requestData: RequestData<{}>) => {
   }
 }
 
+const markRepair =  async (requestData: RequestData<{repairState: string, userId: string}>) => {
+  const response = await fetch(`${API_URL}/mark-repair/${requestData.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(requestData.body),
+    headers: {
+      'Content-type': 'application/json',
+      'token': requestData.token || ''
+    }
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throw Error(data.message || response.statusText)
+  }
+}
+
 export { 
   getAllUsers,
   removeUser,
@@ -241,5 +258,6 @@ export {
   removeRepair,
   getRepair,
   updateRepair,
-  checkAvailability
+  checkAvailability,
+  markRepair
 };

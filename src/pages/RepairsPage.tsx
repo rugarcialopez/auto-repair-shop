@@ -69,15 +69,17 @@ const RepairsPage = () => {
       </Fragment>
     )
   }
-
-  const repairsFiltered = filterRepairsBy(repairsList || []);
-  return (
-    <Fragment>
-      { getRepairsStatus !== '' && <RepairsFilter></RepairsFilter> }
-      { getRepairsStatus !== '' &&  repairsFiltered.length > 0 && <DataList data={repairsFiltered} to='/new-repair' btnText='Add a repair' onRemove={removeHandler}/> }
-      { getRepairsStatus !== '' &&  repairsFiltered.length === 0 && <NoDataFound message='No repairs found!' to='/new-repair' btnText='Add a Repair'/> }
-    </Fragment>
-  )
+  if (getRepairsStatus !== '') {
+    const repairsFiltered = filterRepairsBy(repairsList || []);
+    return (
+      <Fragment>
+        { repairsFiltered.length > 0 && <RepairsFilter></RepairsFilter> }
+        { repairsFiltered.length > 0 && <DataList data={repairsFiltered} to='/new-repair' btnText='Add a repair' onRemove={removeHandler}/> }
+        { repairsFiltered.length === 0 && <NoDataFound message='No repairs found!' to='/new-repair' btnText='Add a Repair'/> }
+      </Fragment>
+      )
+  }
+  return <LoadingSpinner/>
 
 }
 

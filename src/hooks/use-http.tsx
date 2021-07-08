@@ -58,7 +58,7 @@ const useHttp = <T,Y> (requestFunction: (requestData: RequestData<Y>) => Promise
       const data = await requestFunction(requestData);
       dispatch({ type: 'success', payload: { data } });
     } catch (error) {
-      dispatch({ type: 'fail', payload: { error }});
+      dispatch({ type: 'fail', payload: { error: error.message }});
     }
   }, [ requestFunction ]);
 

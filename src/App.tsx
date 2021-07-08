@@ -5,6 +5,7 @@ import AuthPage from './pages/AuthPage';
 import EditRepairPage from './pages/EditRepairPage';
 import EditUserPage from './pages/EditUserPage';
 import HomePage from './pages/HomePage';
+import MarkPage from './pages/MarkPage';
 import NewRepairPage from './pages/NewRepairPage';
 import NewUserPage from './pages/NewUserPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -33,6 +34,9 @@ function App() {
         </Route>
         { !authContext.isLoggedIn && <Route path='/login'>
           <AuthPage />
+        </Route>}
+        { authContext.isLoggedIn && <Route path='/repairs/mark/:id'>
+          <MarkPage />
         </Route>}
         { authContext.isLoggedIn && authContext.role === 'manager' && <Route path='/repairs/:id'>
           <EditRepairPage />

@@ -22,10 +22,14 @@ const DataItem: React.FC<{data: Data, onRemove: (id: string) => void }> = (props
         { props.data.role &&  <figcaption>{props.data.role}</figcaption>}
         { props.data.date && <figcaption>Date: {props.data.date}</figcaption> }
         { props.data.time && <figcaption>Time: { props.data.time}{ props.data.time < 12 ? 'am' : 'pm'}</figcaption> }
+        { props.data.repairState && <figcaption>State: {props.data.repairState}</figcaption> }
       </figure>
       { authContext.role === 'manager' && <button onClick={removeHanler} className='btn'>Remove</button> }
       { authContext.role === 'manager' && <Link className='btn' to={props.data.date ? `/repairs/${props.data.id}` : `/users/${props.data.id}`}>
         View Fullscreen
+      </Link> }
+      { props.data.repairState && !(props.data.repairState !== 'uncompleted' && authContext.role === 'user') && <Link className='btn' to={`/repairs/mark/${props.data.id}?repairState=${props.data.repairState}` }>
+        Mark
       </Link> }
     </li>
   );
