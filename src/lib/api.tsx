@@ -1,6 +1,6 @@
 import RequestData from "../models/Request";
 
-const API_URL = 'http://localhost:4000/api';
+const API_URL = process.env.REACT_APP_REPAIR_API_URL;
 
 const getAllUsers = async ( requestData: RequestData<{}>) => {
   const url = requestData.role ? `${API_URL}/users?role=${requestData.role}` : `${API_URL}/users`;
@@ -85,7 +85,7 @@ const removeUser =  async (requestData: RequestData<{}>) => {
   }
 }
 
-const signIn =  async(requestData: RequestData<{email: string, password: string}>) => {
+const signIn =  async(requestData: RequestData<{email: string, password: string}>) => { 
   const response = await fetch(`${API_URL}/signIn`, {
     method: 'POST',
     body: JSON.stringify(requestData.body),
