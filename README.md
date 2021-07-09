@@ -3,7 +3,6 @@
 - The application is a React-based.
 - The application perform all user actions via the REST API, including authentication. (https://github.com/rugarcialopez/repair-api)
 - Users must be able to create an account and log in.
-- The application is a React-based using nextjs.
 - Include at least 2 user roles: Manager and User.
 
 Managers can:
