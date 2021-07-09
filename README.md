@@ -32,7 +32,7 @@ Repairs:
 - Repairs can be marked as complete by a User. Users cannot undo this action.
 - All Repairs can be commented on.
 
-## Deploy on Vercel
+## Deploy on heroku
 
-Hosting URL: https://attendance-nextjs.vercel.app/
+Hosting URL: https://repair-shop-app.herokuapp.com/
 
