@@ -147,7 +147,7 @@ const RepairForm: React.FC<{
           <label htmlFor='user'>Choose a user for this repair</label>
           <select value={enteredUser} onChange={userChangeHandler} onBlur={userBlurHanlder}>
             <option value="">--Please choose a user--</option>
-            { props.users?.map(user => <option value={user.id}>{user.fullName}</option>)}
+            { props.users?.map(user => <option value={user.id} key={user.id}>{user.fullName}</option>)}
           </select>
           {userHasError && <p className={classes['error-text']}>Please select a user.</p>}
         </div>
