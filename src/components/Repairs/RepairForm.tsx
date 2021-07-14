@@ -119,7 +119,7 @@ const RepairForm: React.FC<{
 
   const descriptionClasses = !descriptionHasError ? classes.control : classes.control + ' ' + classes.invalid;
   const dateClasses = !dateHasError ? classes.control : classes.control + ' ' + classes.invalid;
-  const timeClasses = !timeHasError ? classes.control + ' ' + classes.time  : classes.control + ' ' + classes.invalid;
+  const timeClasses = !timeHasError ? classes.control + ' ' + classes.time  : classes.control +  ' ' + classes.time + ' '+ classes.invalid;
   const userClasses = !userHasError ? classes.control : classes.control + ' ' + classes.invalid;
 
   return (
@@ -139,9 +139,9 @@ const RepairForm: React.FC<{
         <div className={timeClasses}>
           <label htmlFor='time'>Choose a repair time (opening hours 09:00 to 18:00)</label>
           <input type='time' id='time' value={enteredTime} onChange={timeChangeHandler} onBlur={timeBlurHanlder} min='09:00' max='18:00' step='3600' aria-label='time-input'/>
-          {dateHasError && <p className={classes['error-text']}>Please enter a time.</p>}
           <button className='btn' type='button' onClick={checkAvailabilityHandler} disabled={isTimeAvailable}>Check availability</button>
           {!isTimeAvailable && <p className={classes['error-text']}>{timeError}</p> }
+          {timeHasError && <p className={classes['error-text']}>Please enter a time.</p>}
         </div>
         <div className={userClasses}>
           <label htmlFor='user'>Choose a user for this repair</label>
