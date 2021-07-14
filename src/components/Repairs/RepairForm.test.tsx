@@ -1,6 +1,8 @@
 import { screen, render, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Repair from '../../models/Repair';
 import RepairForm from './RepairForm';
+import selectEvent from 'react-select-event';
 
 describe('Repair Form', () => {
 
@@ -39,6 +41,14 @@ describe('Repair Form', () => {
     fireEvent.change(dateInput, { target: { value: ''}});
     fireEvent.focusOut(dateInput);
     const error = screen.queryByText('Please enter a date.');
+    expect(error).toBeInTheDocument();
+  });
+
+  test('renders time error if time field is empty', () => {
+    const timeInput = screen.getByLabelText('time-input');
+    fireEvent.change(timeInput, { target: { value: ''}});
+    fireEvent.focusOut(timeInput);
+    const error = screen.queryByText('Please enter a time.');
     expect(error).toBeInTheDocument();
   });
 
