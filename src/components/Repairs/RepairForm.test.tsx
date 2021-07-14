@@ -1,8 +1,6 @@
 import { screen, render, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import Repair from '../../models/Repair';
 import RepairForm from './RepairForm';
-import selectEvent from 'react-select-event';
 
 describe('Repair Form', () => {
 
