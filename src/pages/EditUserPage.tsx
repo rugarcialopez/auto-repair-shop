@@ -1,16 +1,15 @@
 import { useContext, useEffect } from "react";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import Modal from "../components/UI/Modal";
 import UserForm from "../components/Users/UserForm";
 import useHttp from "../hooks/use-http";
-import { getUser, updateUser } from "../lib/api";
+import { getUser } from "../lib/api";
 import User from "../models/User";
 import AuthContext from "../store/auth-context";
 
 const EditUserPage = () => {
-  const history = useHistory();
-  const { sendRequest: getUserRequest, data: getUserData, status: getUserStatus } = useHttp<User, {}>(getUser);
-  const { sendRequest: updateUserRequest, status: updateUserStatus, error: updateUserError } = useHttp<{message: string}, {fullName: string, email: string, role: string}>(updateUser);
+  const { sendRequest, data, isLoading, error, removeError } = useHttp<User, {}>(getUser);
 
   const authContext = useContext(AuthContext);
   const params: { id: string} = useParams();
@@ -18,23 +17,18 @@ const EditUserPage = () => {
   const token = authContext.token;
 
   useEffect(() => {
-    getUserRequest({ token, id});
-  }, [getUserRequest, token, id]);
+    sendRequest({token, id });
+  }, [ sendRequest, token, id]);
 
-  const updateUserHandler = async(updatedUser: User) => {
-    const token = authContext.token;
-    updateUserRequest({token, id, body: updatedUser});
+  if (isLoading) {
+    return <LoadingSpinner></LoadingSpinner>;
+  }
+  if (error) {
+    return <Modal onClose={removeError}>{error}</Modal>;
   }
 
-  if (getUserStatus === 'pending') {
-    return <LoadingSpinner/>
-  }
 
-  if (updateUserStatus === 'completed' && !updateUserError) {
-    history.push('/users');
-  }
-
-  return <UserForm user={getUserData || undefined} onSubmit={updateUserHandler}/>
+  return <UserForm user={data || undefined}/>
 
 }
 

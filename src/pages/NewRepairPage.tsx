@@ -1,48 +1,55 @@
 import { useContext, useEffect } from "react";
-import { useHistory } from "react-router";
 import RepairForm from "../components/Repairs/RepairForm";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import Modal from "../components/UI/Modal";
 import useHttp from "../hooks/use-http";
-import { addRepair, getAllUsers } from "../lib/api";
-import Repair from "../models/Repair";
+import { getAllUsers } from "../lib/api";
 import AuthContext from "../store/auth-context";
 
 const NewRepairPage = () => {
   const authContext = useContext(AuthContext);
   const token = authContext.token;
-  const history = useHistory();
-  const { sendRequest: getAllUsersRequest, data: allUsers, status: getAllUsersStatus, error: getAllUsersError } = useHttp<{id: string, fullName: string, role: string}[], {}>(getAllUsers);
-  const { sendRequest: addRepairRequest, status: addRepairStatus, error: addRepairError } = useHttp<{message: string}, Repair>(addRepair);
+  const { sendRequest, data, error, isLoading, removeError } = useHttp<{id: string, fullName: string, role: string}[], {}>(getAllUsers);
 
   useEffect(() => {
-    getAllUsersRequest({token, role: 'user'})
-  }, [ token, getAllUsersRequest ]);
+    sendRequest({token, role: 'user'})
+  }, [ token, sendRequest ]);
 
-  const addRepairHandler = async(repair: Repair) => {
-    addRepairRequest({
-      token,
-      body: {
-        description: repair.description,
-        date: repair.date,
-        time: repair.time,
-        userId: repair.userId
-      }
-    });
+  if (isLoading) {
+    return <LoadingSpinner></LoadingSpinner>;
+  }
+  if (error) {
+    return <Modal onClose={removeError}>{error}</Modal>;
   }
 
-  if (addRepairError) {
-    alert(addRepairError);
-  }
+  
+  return <RepairForm users={data}/>
 
-  if (addRepairStatus === 'completed' && !addRepairError) {
-    history.push('/repairs');
-  }
+  // const addRepairHandler = async(repair: Repair) => {
+  //   addRepairRequest({
+  //     token,
+  //     body: {
+  //       description: repair.description,
+  //       date: repair.date,
+  //       time: repair.time,
+  //       userId: repair.userId
+  //     }
+  //   });
+  // }
 
-  if (getAllUsersStatus === 'completed' && !getAllUsersError) {
-    return <RepairForm onSubmit={addRepairHandler} users={allUsers}/>
-  }
+  // if (addRepairError) {
+  //   alert(addRepairError);
+  // }
 
-  return <LoadingSpinner/>
+  // if (addRepairStatus === 'completed' && !addRepairError) {
+  //   history.push('/repairs');
+  // }
+
+  // if (getAllUsersStatus === 'completed' && !getAllUsersError) {
+  //   return <RepairForm onSubmit={addRepairHandler} users={allUsers}/>
+  // }
+
+  // return <LoadingSpinner/>
 
 }
 

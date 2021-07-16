@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 import useInput from '../../hooks/use-input';
+import { addUser, updateUser } from '../../lib/api';
 import User from '../../models/User';
+import AuthContext from '../../store/auth-context';
+import Modal from '../UI/Modal';
 import classes from './UserForm.module.css';
 
 const isNotEmpty = (value: string) => value.trim() !== '';
@@ -11,7 +15,11 @@ const isEmail = (value: string) => {
 
 const isCorrectPassword = (value: string) => isNotEmpty(value) && value.length >= 5;
 
-const UserForm: React.FC<{ onSubmit: (newUser: User) => void, user?: User}> = (props) => {
+const UserForm: React.FC<{ user?: User}> = (props) => {
+  const authContext = useContext(AuthContext);
+  const token = authContext.token;
+  const [error, setError] = useState(null);
+  const history = useHistory();
   const fullName = props.user ? props.user.fullName : null;
   const email = props.user ? props.user.email : null;
   const role = props.user ? props.user.role : null;
@@ -58,21 +66,34 @@ const UserForm: React.FC<{ onSubmit: (newUser: User) => void, user?: User}> = (p
     setRoleSelected(event.target.value);
   }
 
-  const submitHandler = (event: React.FormEvent) => {
+  const submitHandler = async(event: React.FormEvent) => {
     event.preventDefault();
-    if (props.user) {
-      props.onSubmit({
-        fullName: enteredFullName,
-        email: enteredEmail,
-        role: roleSelected
-      });
-    } else {
-      props.onSubmit({
-        fullName: enteredFullName,
-        email: enteredEmail,
-        password: enteredPassword,
-        role: roleSelected
-      });
+    try {
+      setError(null);
+      if (props.user) {
+        await updateUser({
+          token,
+          id: props.user.id,
+          body:{
+            fullName: enteredFullName,
+            email: enteredEmail,
+            role: roleSelected
+          }
+        });
+      } else {
+        await addUser({
+          token,
+          body:{
+            fullName: enteredFullName,
+            email: enteredEmail,
+            role: roleSelected,
+            password: enteredPassword
+          }
+        });
+      }
+      history.push('/users');
+    } catch (error) {
+      setError(error.message);
     }
   }
 
@@ -81,36 +102,39 @@ const UserForm: React.FC<{ onSubmit: (newUser: User) => void, user?: User}> = (p
   const passwordClasses = !passwordInputHasError ? classes.control : classes.control + ' ' + classes.invalid;
 
   return (
-    <section className={classes.userForm}>
-      <h1>User form</h1>
-      <form onSubmit={submitHandler}>
-        <div className={fullNameClasses}>
-          <label htmlFor='fullName'>Your full name</label>
-          <input type='text' id='fullName' onChange={fullNameChangeHandler} value={enteredFullName} onBlur={fullNameBlurHanlder} aria-label='fullName-input'/>
-          {fullNameInputHasError && <p className={classes['error-text']}>Please enter a full name.</p>}
-        </div>
-        <div className={emailClasses}>
-          <label htmlFor='email'>Your Email</label>
-          <input type='email' id='email' onChange={emailChangeHandler} value={enteredEmail} onBlur={emailBlurHanlder} aria-label='email-input'/>
-          {emailInputHasError && <p className={classes['error-text']}>Please enter a valid email address.</p>}
-        </div>
-        { !props.user && <div className={passwordClasses}>
-          <label htmlFor='password'>Your Password</label>
-          <input type='password' id='password' onChange={passwordChangeHandler} value={enteredPassword} onBlur={passwordBlurHanlder} aria-label='password-input'/>
-          {passwordInputHasError && <p className={classes['error-text']}>Please enter a valid password (min length 5 characters)</p>}
-        </div> }
-        <div className={classes.control}>
-          <label htmlFor='role'>Your role</label>
-          <select name='role' id='role' value={roleSelected} onChange={roleChangeHandler}>
-            <option value='manager'>Manager</option>
-            <option value='user'>User</option>
-          </select>
-        </div>
-        <div className={classes.actions}>
-          <button type='submit' disabled={!formIsValid}>{ props.user ? 'Update user' : 'Add user' }</button>
-        </div>
-      </form>
-    </section>
+    <Fragment>
+      { error && <Modal onClose={() => setError(null)}>{error}</Modal>}
+      <section className={classes.userForm}>
+        <h1>User form</h1>
+        <form onSubmit={submitHandler}>
+          <div className={fullNameClasses}>
+            <label htmlFor='fullName'>Your full name</label>
+            <input type='text' id='fullName' onChange={fullNameChangeHandler} value={enteredFullName} onBlur={fullNameBlurHanlder} aria-label='fullName-input'/>
+            {fullNameInputHasError && <p className={classes['error-text']}>Please enter a full name.</p>}
+          </div>
+          <div className={emailClasses}>
+            <label htmlFor='email'>Your Email</label>
+            <input type='email' id='email' onChange={emailChangeHandler} value={enteredEmail} onBlur={emailBlurHanlder} aria-label='email-input'/>
+            {emailInputHasError && <p className={classes['error-text']}>Please enter a valid email address.</p>}
+          </div>
+          { !props.user && <div className={passwordClasses}>
+            <label htmlFor='password'>Your Password</label>
+            <input type='password' id='password' onChange={passwordChangeHandler} value={enteredPassword} onBlur={passwordBlurHanlder} aria-label='password-input'/>
+            {passwordInputHasError && <p className={classes['error-text']}>Please enter a valid password (min length 5 characters)</p>}
+          </div> }
+          <div className={classes.control}>
+            <label htmlFor='role'>Your role</label>
+            <select name='role' id='role' value={roleSelected} onChange={roleChangeHandler}>
+              <option value='manager'>Manager</option>
+              <option value='user'>User</option>
+            </select>
+          </div>
+          <div className={classes.actions}>
+            <button type='submit' disabled={!formIsValid}>{ props.user ? 'Update user' : 'Add user' }</button>
+          </div>
+        </form>
+      </section>
+    </Fragment>
   );
 };
 

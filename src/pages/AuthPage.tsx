@@ -1,6 +1,7 @@
-import { useContext, useEffect } from "react";
+import { Fragment, useContext } from "react";
 import { useHistory } from "react-router";
 import AuthForm from "../components/Auth/AuthForm";
+import Modal from "../components/UI/Modal";
 import useHttp from "../hooks/use-http";
 import { signIn, signUp } from "../lib/api";
 import AuthUser from "../models/AuthUser";
@@ -13,18 +14,20 @@ type Login = {
   userId: string;
 }
 
-
 const AuthPage = () => {
   const authContext = useContext(AuthContext);
   const history = useHistory();
-  const { sendRequest: signInRequest, data: signInData, status: signInStatus, error: signInError } = useHttp<Login, { password: string, email: string }>(signIn);
-  const { sendRequest: signUpRequest, data: signUpData, status: signUpStatus, error: signUpError } = useHttp<Login, { fullName: string, password: string, role: string, email: string }>(signUp);
+  const { sendRequest: signInRequest, data: signInData, status: signInStatus, error: signInError, removeError: removeSignInError } = useHttp<Login, { password: string, email: string }>(signIn);
+  const { sendRequest: signUpRequest, data: signUpData, status: signUpStatus, error: signUpError, removeError: removeSignUpError } = useHttp<Login, { fullName: string, password: string, role: string, email: string }>(signUp);
 
-  useEffect(() => {
-    if (signInError || signUpError) {
-      alert(signInError || signUpError);
+  const closeHandler = () => {
+    if (signInError) {
+      removeSignInError();
     }
-  }, [signInError, signUpError])
+    if (signUpError) {
+      removeSignUpError();
+    }
+  }
 
   const loginHandler = async (user: AuthUser) => {
     const isLogin = !(user.fullName && user.role);
@@ -64,7 +67,12 @@ const AuthPage = () => {
     history.push('/repairs');
   }
 
-  return <AuthForm onLogin={loginHandler}/>
+  return (
+    <Fragment>
+      {(signUpError || signInError) && <Modal onClose={closeHandler}>{signUpError || signInError}</Modal>}
+      <AuthForm onLogin={loginHandler}/>
+    </Fragment> 
+  )
 }
 
 export default AuthPage;

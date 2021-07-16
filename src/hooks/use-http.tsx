@@ -8,7 +8,7 @@ type HttpState<T> = {
   status: string
 }
 
-type HttpAction<T> =  { type: 'pending' } | { type: 'success'; payload: { data: T } } | { type: 'fail'; payload: { error: string} };
+type HttpAction<T> =  { type: 'pending' } | { type: 'success'; payload: { data: T } } | { type: 'fail'; payload: { error: string} } | { type: 'removeError' } ;
 
 const initialState = {
   data: null,
@@ -44,6 +44,14 @@ const createHttpReducer = <T,>() => (state: HttpState<T>, action: HttpAction<T>)
       status: 'completed'
     }
   }
+  if (action.type === 'removeError') {
+   return {
+     ...state,
+     error: null,
+     data: null,
+     status: ''
+   } 
+  }
   return initialState;
 }
 
@@ -62,9 +70,14 @@ const useHttp = <T,Y> (requestFunction: (requestData: RequestData<Y>) => Promise
     }
   }, [ requestFunction ]);
 
+  const removeError = () => {
+    dispatch({type: 'removeError'});
+  }
+
   return {
     ...httpState,
-    sendRequest
+    sendRequest,
+    removeError
   }
 
 }

@@ -23,7 +23,6 @@ const Mark: React.FC<{repairState: string, repairDescription: string}> = (props)
   }
 
   const markdChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('markdChangeHandler');
     setRepairState(event.target.value);
   }
 

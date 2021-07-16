@@ -4,44 +4,36 @@ import Data from '../models/Data';
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import NoDataFound from "../components/UI/NoDataFound";
 import useHttp from "../hooks/use-http";
-import { getAllUsers, removeUser } from "../lib/api";
+import { getAllUsers } from "../lib/api";
 import AuthContext from "../store/auth-context"
+import Modal from "../components/UI/Modal";
 
 const UsersPage = () => {
   const authContext = useContext(AuthContext);
   const token = authContext.token;
-  const { sendRequest: getAllUsersRequest, data: allUsers, status: statusAllUsers, error: errorAllUsers } = useHttp<Data[], {}>(getAllUsers);
-  let { sendRequest: removeUserRequest, data: newAllUsers, status: statusRemoveUser, error: errorRemoveUser } = useHttp<Data[], {}>(removeUser);
+  const { sendRequest, data, status, error, removeError, isLoading } = useHttp<Data[], {}>(getAllUsers);
 
   useEffect(() => {
-    getAllUsersRequest({token})
-  }, [ token, getAllUsersRequest ]);
+    sendRequest({token});
+  }, [ token, sendRequest ]);
 
-  const removeHandler = useCallback(async(id: string) => {
-    removeUserRequest({token, id});
-  }, [removeUserRequest, token]);
+  const removedHandler = useCallback(() => {
+    sendRequest({token});
+  }, [sendRequest, token])
 
-  if (statusAllUsers === 'pending' || statusRemoveUser === 'pending') {
+  if (isLoading) {
     return <LoadingSpinner/>
   }
 
-  if (errorAllUsers || errorRemoveUser) {
-    return <p className='centered'>{errorAllUsers || errorRemoveUser}</p>
+  if (error) {
+    return <Modal onClose={removeError}>{error}</Modal>
   }
 
-  if (statusAllUsers === 'completed' && (!allUsers || allUsers.length === 0)) {
+  if (status === 'completed' && (!data || data.length === 0)) {
     return <NoDataFound message='No users found!' to='/new-user' btnText='Add a User'/>
   }
 
-  if (statusRemoveUser === 'completed' && (!newAllUsers || newAllUsers.length === 0)) {
-    return <NoDataFound message='No users found!' to='/new-user' btnText='Add a User'/>
-  }
-
-  if(statusRemoveUser === 'completed' && newAllUsers && newAllUsers.length > 0) {
-    return <DataList data={newAllUsers} to='/new-user' btnText='Add a user' onRemove={removeHandler}/>
-  }
-
-  return <DataList data={allUsers || []} to='/new-user' btnText='Add a user' onRemove={removeHandler}/>
+  return <DataList data={data || []} to='/new-user' btnText='Add a user' onRemoved={removedHandler}/>
 }
 
 export default UsersPage;

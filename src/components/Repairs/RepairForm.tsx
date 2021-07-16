@@ -1,22 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 import useInput from '../../hooks/use-input';
-import { checkAvailability } from '../../lib/api';
+import { addRepair, checkAvailability, updateRepair } from '../../lib/api';
 import Repair from '../../models/Repair';
 import AuthContext from '../../store/auth-context';
+import Modal from '../UI/Modal';
 import classes from './RepairForm.module.css';
 
 const isNotEmpty = (value: string) => value.trim() !== '';
 
 const RepairForm: React.FC<{
-  onSubmit: (repair: Repair) => void,
   users: {id: string, fullName: string, role: string}[] | null,
   repair?: { id: string, description: string, date: string, time: number, userId: string }
   }> = (props) => {
 
   const authContext = useContext(AuthContext);
+  const [error, setError] = useState(null);
+  const history = useHistory();
   const token = authContext.token;
 
-  const id = props.repair ? props.repair.id : null;
+  const id = props.repair ? props.repair.id : undefined;
   const description = props.repair ? props.repair.description : null;
   const date = props.repair ? props.repair.date : null;
   const time = props.repair ? props.repair.time : null;
@@ -80,7 +83,7 @@ const RepairForm: React.FC<{
 
   let formIsValid = enteredDescriptionIsValid && enteredTimeIsValid && enteredDateIsValid && enteredUserIsValid && isTimeAvailable;
 
-  const submitHandler = (event: React.FormEvent) => {
+  const submitHandler = async (event: React.FormEvent) => {
     event.preventDefault();
     let repair: Repair = {
       description: enteredDescription,
@@ -88,10 +91,14 @@ const RepairForm: React.FC<{
       time: parseInt(enteredTime.split(':')[0]),
       userId: enteredUser
     }
-    if (id) {
-      repair = {...repair, id: id};
+    const fn = id ? updateRepair : addRepair;
+    try {
+      setError(null);
+      await fn({token, id, body: repair});
+      history.push('/repairs');
+    } catch (error) {
+      setError(error.message);
     }
-    props.onSubmit(repair);
   }
 
   const checkAvailabilityHandler = async () => {
@@ -123,39 +130,42 @@ const RepairForm: React.FC<{
   const userClasses = !userHasError ? classes.control : classes.control + ' ' + classes.invalid;
 
   return (
-    <section className={classes.repairForm}>
-      <h1>Repair form</h1>
-      <form onSubmit={submitHandler}>
-        <div className={descriptionClasses}>
-          <label htmlFor='description'>Description</label>
-          <input type='text' id='description' value={enteredDescription} onChange={descriptionChangeHandler} onBlur={descriptionBlurHanlder} aria-label='description-textarea'/>
-          {descriptionHasError && <p className={classes['error-text']}>Please enter a description.</p>}
-        </div>
-        <div className={dateClasses}>
-          <label htmlFor='date'>Date</label>
-          <input type='date' id='date' value={enteredDate} onChange={dateChangeHandler} onBlur={dateBlurHanlder} aria-label='date-input'/>
-          {dateHasError && <p className={classes['error-text']}>Please enter a date.</p>}
-        </div>
-        <div className={timeClasses}>
-          <label htmlFor='time'>Choose a repair time (opening hours 09:00 to 18:00)</label>
-          <input type='time' id='time' value={enteredTime} onChange={timeChangeHandler} onBlur={timeBlurHanlder} min='09:00' max='18:00' step='3600' aria-label='time-input'/>
-          <button className='btn' type='button' onClick={checkAvailabilityHandler} disabled={isTimeAvailable}>Check availability</button>
-          {!isTimeAvailable && <p className={classes['error-text']}>{timeError}</p> }
-          {timeHasError && <p className={classes['error-text']}>Please enter a time.</p>}
-        </div>
-        <div className={userClasses}>
-          <label htmlFor='user'>Choose a user for this repair</label>
-          <select value={enteredUser} onChange={userChangeHandler} onBlur={userBlurHanlder}>
-            <option value="">--Please choose a user--</option>
-            { props.users?.map(user => <option value={user.id} key={user.id}>{user.fullName}</option>)}
-          </select>
-          {userHasError && <p className={classes['error-text']}>Please select a user.</p>}
-        </div>
-        <div className={classes.actions}>
-          <button type='submit' disabled={!formIsValid}>{props.repair ? 'Update repair': 'Add repair'}</button>
-        </div>
-      </form>
-    </section>
+    <Fragment>
+      { error && <Modal onClose={() => setError(null)}>{error}</Modal>}
+      <section className={classes.repairForm}>
+        <h1>Repair form</h1>
+        <form onSubmit={submitHandler}>
+          <div className={descriptionClasses}>
+            <label htmlFor='description'>Description</label>
+            <input type='text' id='description' value={enteredDescription} onChange={descriptionChangeHandler} onBlur={descriptionBlurHanlder} aria-label='description-textarea'/>
+            {descriptionHasError && <p className={classes['error-text']}>Please enter a description.</p>}
+          </div>
+          <div className={dateClasses}>
+            <label htmlFor='date'>Date</label>
+            <input type='date' id='date' value={enteredDate} onChange={dateChangeHandler} onBlur={dateBlurHanlder} aria-label='date-input'/>
+            {dateHasError && <p className={classes['error-text']}>Please enter a date.</p>}
+          </div>
+          <div className={timeClasses}>
+            <label htmlFor='time'>Choose a repair time (opening hours 09:00 to 18:00)</label>
+            <input type='time' id='time' value={enteredTime} onChange={timeChangeHandler} onBlur={timeBlurHanlder} min='09:00' max='18:00' step='3600' aria-label='time-input'/>
+            <button className='btn' type='button' onClick={checkAvailabilityHandler} disabled={isTimeAvailable}>Check availability</button>
+            {!isTimeAvailable && <p className={classes['error-text']}>{timeError}</p> }
+            {timeHasError && <p className={classes['error-text']}>Please enter a time.</p>}
+          </div>
+          <div className={userClasses}>
+            <label htmlFor='user'>Choose a user for this repair</label>
+            <select value={enteredUser} onChange={userChangeHandler} onBlur={userBlurHanlder}>
+              <option value="">--Please choose a user--</option>
+              { props.users?.map(user => <option value={user.id} key={user.id}>{user.fullName}</option>)}
+            </select>
+            {userHasError && <p className={classes['error-text']}>Please select a user.</p>}
+          </div>
+          <div className={classes.actions}>
+            <button type='submit' disabled={!formIsValid}>{props.repair ? 'Update repair': 'Add repair'}</button>
+          </div>
+        </form>
+      </section>
+    </Fragment>
   );
 };
 

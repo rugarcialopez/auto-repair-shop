@@ -160,7 +160,6 @@ const removeRepair =  async (requestData: RequestData<{}>) => {
   });
   const data = await response.json();
   if (response.ok) {
-    return data.repairs;
   } else {
     throw Error(data.message || response.statusText)
   }
@@ -184,6 +183,7 @@ const getRepair = async ( requestData: RequestData<{}>) => {
     }
   });
   const usersData = await usersResponse.json();
+  
   if (usersResponse.ok) {
     return { repair: repairData.repair, users: usersData.users };
   } else {
