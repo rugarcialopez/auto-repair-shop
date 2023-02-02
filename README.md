@@ -27,7 +27,7 @@ Repairs:
 - Repairs can be marked as complete by a User. Users cannot undo this action.
 - All Repairs can be commented on.
 
-## Deploy on heroku
+## Deploy on Vercel
 
-Hosting URL: https://repair-shop-app.herokuapp.com/
+Hosting URL: https://auto-repair-shop-five.vercel.app/
 
